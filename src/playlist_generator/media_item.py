@@ -42,9 +42,12 @@ class MediaItem:
         try:
             lists += [ self.genre() ]
             lists += re.findall('\\((cover|live|unplugged|acoustic|remix|instrumental)', self.title().lower())
+
             for i in self.media.tag.comments:
-                print(i)
                 lists += i.text.replace('|', ',').replace('/', ',').strip('|').split(',')
+
+            if len(lists) == 2:
+                lists += [ 'stats/forever_alone' ]
 
             if time.time() - os.path.getmtime(self.path) < (3 * 30 * 24 * 60 * 60) :
                 lists += [ 'stats/recently_modified' ]
