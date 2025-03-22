@@ -2,7 +2,7 @@ import re
 import time
 import os
 from dataclasses import dataclass
-from eyed3 import core
+from eyed3 import core, id3
 
 @dataclass
 class MediaItem:
@@ -37,16 +37,18 @@ class MediaItem:
             return 0
 
     def playlists(self) -> set:
-        lists = [ 'stats/all' ]
+        lists = []
 
         try:
-            lists += [ self.genre() ]
-            lists += re.findall('\\((cover|live|unplugged|acoustic|remix|instrumental)', self.title().lower())
-
+            lists += re.findall('\\((cover|live|unplugged|acoustic|remix|instrumental|classic)', self.title().lower())
             for i in self.media.tag.comments:
-                lists += i.text.replace('|', ',').replace('/', ',').strip('|').split(',')
+                lists += i.text.replace('|', ',').replace('/', ',').strip(',').split(',')
 
-            if len(lists) == 2:
+            custom_lists = [ item for item in lists if item.lower() not in list(id3.genres.values()) ]
+            if len(custom_lists) > 3:
+                lists += [ 'stats/im_popular' ]
+
+            if len(lists) == 0:
                 lists += [ 'stats/forever_alone' ]
 
             if time.time() - os.path.getmtime(self.path) < (3 * 30 * 24 * 60 * 60) :
@@ -55,7 +57,10 @@ class MediaItem:
             if self.year() > 1900:
                 median = round(self.year(), -1)
                 lists += [ 'stats/years-{}-{}'.format((int(median) - 5), (int(median) + 4)) ]
+
+            lists += [ self.genre() ]
         except:
             lists += [ 'stats/unknown_errors' ]
 
+        lists += [ 'stats/all' ]
         return set([x for x in lists if x != None])
