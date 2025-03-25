@@ -40,7 +40,6 @@ class MediaItem:
         lists = []
 
         try:
-            lists += re.findall('\\((cover|live|unplugged|acoustic|remix|instrumental|classic)', self.title().lower())
             for i in self.media.tag.comments:
                 lists += i.text.replace('|', ',').replace('/', ',').strip(',').split(',')
 
@@ -48,6 +47,7 @@ class MediaItem:
             if len(custom_lists) > 3:
                 lists += [ 'stats/im_popular' ]
 
+            lists += re.findall('\\((cover|live|unplugged|acoustic|remix|instrumental|classic)', self.title().lower())
             if len(lists) == 0:
                 lists += [ 'stats/forever_alone' ]
 
