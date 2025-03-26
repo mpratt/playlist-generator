@@ -43,8 +43,8 @@ class MediaItem:
             for i in self.media.tag.comments:
                 lists += i.text.replace('|', ',').replace('/', ',').strip(',').split(',')
 
-            custom_lists = [ item for item in lists if item.lower() not in list(id3.genres.values()) ]
-            if len(custom_lists) > 3:
+            custom_lists = [ item for item in lists if item not in list(id3.genres.values()) ]
+            if len(custom_lists) >= 3:
                 lists += [ 'stats/im_popular' ]
 
             lists += re.findall('\\((cover|live|unplugged|acoustic|remix|instrumental|classic)', self.title().lower())
